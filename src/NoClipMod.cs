@@ -3,7 +3,7 @@ using Il2Cpp;
 using MelonLoader;
 using UnityEngine;
 
-[assembly: MelonInfo(typeof(NoClip.NoClipMod), "NoClip", "1.0.0", "tindolt")]
+[assembly: MelonInfo(typeof(NoClip.NoClipMod), "gregMod.NoClip", "1.0.1", "TeamGreg Modding")]
 [assembly: MelonGame("Waseku", "Data Center")]
 
 namespace NoClip
@@ -32,7 +32,7 @@ namespace NoClip
 
         public override void OnInitializeMelon()
         {
-            var cat = MelonPreferences.CreateCategory("NoClip");
+            var cat = MelonPreferences.CreateCategory("gregMod.NoClip");
 
             ToggleKeyEntry = cat.CreateEntry("ToggleKey", "F4", "Toggle Key",
                 "KeyCode to toggle noclip on/off (e.g. F4, F9, BackQuote).");
