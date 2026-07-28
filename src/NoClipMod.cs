@@ -2,8 +2,9 @@ using System;
 using Il2Cpp;
 using MelonLoader;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
-[assembly: MelonInfo(typeof(NoClip.NoClipMod), "gregMod.NoClip", "1.0.1", "TeamGreg Modding")]
+[assembly: MelonInfo(typeof(NoClip.NoClipMod), "gregMod.NoClip", "1.0.2", "TeamGreg Modding")]
 [assembly: MelonGame("Waseku", "Data Center")]
 
 namespace NoClip
@@ -16,7 +17,7 @@ namespace NoClip
         private static MelonPreferences_Entry<float>  FastMultiplierEntry;
 
         // ── Runtime state ─────────────────────────────────────────────────────
-        private static KeyCode _toggleKey = KeyCode.F4;
+        private static Key _toggleKey = Key.F4;
         private static bool    _active    = false;
 
         // ── Cached scene references (cleared on scene change) ─────────────────
@@ -35,13 +36,13 @@ namespace NoClip
             var cat = MelonPreferences.CreateCategory("gregMod.NoClip");
 
             ToggleKeyEntry = cat.CreateEntry("ToggleKey", "F4", "Toggle Key",
-                "KeyCode to toggle noclip on/off (e.g. F4, F9, BackQuote).");
+                "Input System key to toggle noclip on/off (e.g. F4, F9, Backquote).");
             SpeedEntry = cat.CreateEntry("Speed", 5f, "Speed",
                 "Fly speed in metres per second.");
             FastMultiplierEntry = cat.CreateEntry("FastMultiplier", 3f, "Fast Multiplier",
                 "Speed multiplier applied while holding Left Shift.");
 
-            if (Enum.TryParse<KeyCode>(ToggleKeyEntry.Value, out var k))
+            if (Enum.TryParse<Key>(ToggleKeyEntry.Value, true, out var k) && k != Key.None)
                 _toggleKey = k;
             else
                 LoggerInstance.Warning($"[NoClip] Unknown KeyCode '{ToggleKeyEntry.Value}', defaulting to F4.");
@@ -66,7 +67,10 @@ namespace NoClip
 
         public override void OnUpdate()
         {
-            if (Input.GetKeyDown(_toggleKey))
+            var keyboard = Keyboard.current;
+            if (keyboard == null) return;
+
+            if (keyboard[_toggleKey].wasPressedThisFrame)
                 Toggle();
 
             if (!_active) return;
@@ -79,16 +83,16 @@ namespace NoClip
             if (cam == null) return;
 
             float speed = SpeedEntry.Value;
-            if (Input.GetKey(KeyCode.LeftShift)) speed *= FastMultiplierEntry.Value;
+            if (keyboard.leftShiftKey.isPressed) speed *= FastMultiplierEntry.Value;
 
             // Full 6DoF free-fly relative to camera orientation.
             Vector3 move = Vector3.zero;
-            if (Input.GetKey(KeyCode.W))           move += cam.transform.forward;
-            if (Input.GetKey(KeyCode.S))           move -= cam.transform.forward;
-            if (Input.GetKey(KeyCode.D))           move += cam.transform.right;
-            if (Input.GetKey(KeyCode.A))           move -= cam.transform.right;
-            if (Input.GetKey(KeyCode.Space))       move += Vector3.up;
-            if (Input.GetKey(KeyCode.LeftControl)) move -= Vector3.up;
+            if (keyboard.wKey.isPressed)           move += cam.transform.forward;
+            if (keyboard.sKey.isPressed)           move -= cam.transform.forward;
+            if (keyboard.dKey.isPressed)           move += cam.transform.right;
+            if (keyboard.aKey.isPressed)           move -= cam.transform.right;
+            if (keyboard.spaceKey.isPressed)       move += Vector3.up;
+            if (keyboard.leftCtrlKey.isPressed)    move -= Vector3.up;
 
             if (move.sqrMagnitude > 0.001f)
                 _playerRoot.position += move.normalized * (speed * Time.deltaTime);
