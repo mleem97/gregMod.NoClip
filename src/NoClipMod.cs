@@ -9,6 +9,26 @@ using UnityEngine.InputSystem;
 
 namespace NoClip
 {
+    // Laufzeit-Erkennung gregCore (reiner Typname-Lookup, keine harte Abhaengigkeit).
+    internal static class NoClipGregHost
+    {
+        private const string ProbeType = "gregCore.UI.GregNotificationManager, gregCore";
+        private static bool? _hasCore;
+
+        public static bool HasCore
+        {
+            get
+            {
+                if (_hasCore == null)
+                {
+                    try { _hasCore = System.Type.GetType(ProbeType) != null; }
+                    catch { _hasCore = false; }
+                }
+                return _hasCore.Value;
+            }
+        }
+    }
+
     public class NoClipMod : MelonMod
     {
         // ── Preferences ───────────────────────────────────────────────────────
@@ -48,6 +68,27 @@ namespace NoClip
                 LoggerInstance.Warning($"[NoClip] Unknown KeyCode '{ToggleKeyEntry.Value}', defaulting to F4.");
 
             LoggerInstance.Msg($"[NoClip] Loaded. Press {_toggleKey} to toggle.");
+            if (NoClipGregHost.HasCore)
+            {
+                try { RegisterCoreExtras(); } catch { }
+            }
+        }
+
+        // Mod-Vertrag + Tasten-HUD fuers F1-Hub (kein Panel -> kein Oeffner).
+        // Nur mit gregCore aufrufen (JIT-Trennung ohne gregCore-DLL).
+        private void RegisterCoreExtras()
+        {
+            try
+            {
+                gregCore.Core.Mods.GregModRegistry.Register(
+                    "gregMod.NoClip", "NoClip", "1.0.2",
+                    System.Array.Empty<string>());
+                gregCore.UI.GregHudRegistry.Register("noclip", _toggleKey.ToString(), "NoClip");
+            }
+            catch (System.Exception ex)
+            {
+                MelonLogger.Warning("[NoClip] Hub-Registrierung fehlgeschlagen: " + ex.GetBaseException().Message);
+            }
         }
 
         public override void OnSceneWasInitialized(int buildIndex, string sceneName)
