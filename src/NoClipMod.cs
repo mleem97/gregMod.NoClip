@@ -4,7 +4,7 @@ using MelonLoader;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-[assembly: MelonInfo(typeof(NoClip.NoClipMod), "gregMod.NoClip", "1.0.2", "TeamGreg Modding")]
+[assembly: MelonInfo(typeof(NoClip.NoClipMod), "gregMod.NoClip", "1.0.3", "TeamGreg Modding")]
 [assembly: MelonGame("Waseku", "Data Center")]
 
 namespace NoClip
@@ -81,7 +81,7 @@ namespace NoClip
             try
             {
                 gregCore.Core.Mods.GregModRegistry.Register(
-                    "gregMod.NoClip", "NoClip", "1.0.2",
+                    "gregMod.NoClip", "NoClip", "1.0.3",
                     System.Array.Empty<string>());
                 gregCore.UI.GregHudRegistry.Register("noclip", _toggleKey.ToString(), "NoClip");
             }
