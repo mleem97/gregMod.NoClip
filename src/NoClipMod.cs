@@ -37,7 +37,7 @@ namespace NoClip
         private static MelonPreferences_Entry<float>  FastMultiplierEntry;
 
         // ── Runtime state ─────────────────────────────────────────────────────
-        private static Key _toggleKey = Key.F4;
+        private static Key _toggleKey = Key.N;
         private static bool    _active    = false;
 
         // ── Cached scene references (cleared on scene change) ─────────────────
@@ -55,7 +55,7 @@ namespace NoClip
         {
             var cat = MelonPreferences.CreateCategory("gregMod.NoClip");
 
-            ToggleKeyEntry = cat.CreateEntry("ToggleKey", "F4", "Toggle Key",
+            ToggleKeyEntry = cat.CreateEntry("ToggleKey", "N", "Toggle Key",
                 "Input System key to toggle noclip on/off (e.g. F4, F9, Backquote).");
             SpeedEntry = cat.CreateEntry("Speed", 5f, "Speed",
                 "Fly speed in metres per second.");
@@ -65,7 +65,7 @@ namespace NoClip
             if (Enum.TryParse<Key>(ToggleKeyEntry.Value, true, out var k) && k != Key.None)
                 _toggleKey = k;
             else
-                LoggerInstance.Warning($"[NoClip] Unknown KeyCode '{ToggleKeyEntry.Value}', defaulting to F4.");
+                LoggerInstance.Warning($"[NoClip] Unknown KeyCode '{ToggleKeyEntry.Value}', defaulting to N.");
 
             LoggerInstance.Msg($"[NoClip] Loaded. Press {_toggleKey} to toggle.");
             if (NoClipGregHost.HasCore)
